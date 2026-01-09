@@ -8,22 +8,21 @@
 <style>
 :root {
   --ink:#1b1f24;
-  --muted:#5b616a;
+  --muted:#6b7280;
   --border:#d7dbe0;
   --accent:#4a0f26;
-  --gap:12px;
 }
-* { box-sizing:border-box; }
+* { box-sizing: border-box; }
 body {
-  margin:0;
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
   background:#fff;
-  color:var(--ink);
+  color: var(--ink);
 }
 .container {
-  max-width:940px;
-  margin:0 auto;
-  padding:24px;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 24px;
 }
 .card {
   border:1px solid var(--border);
@@ -51,12 +50,12 @@ body {
 .brand-sub {
   margin-top:6px;
   font-size:14px;
-  color:#6b7280;
+  color:var(--muted);
 }
 .grid-2 {
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:var(--gap);
+  gap:12px;
 }
 label { font-size:13px; }
 input, textarea {
@@ -64,6 +63,7 @@ input, textarea {
   padding:10px;
   border:1px solid var(--border);
   border-radius:8px;
+  font-size:14px;
 }
 textarea { min-height:80px; }
 .section-title {
@@ -81,49 +81,37 @@ textarea { min-height:80px; }
 }
 .controls {
   display:flex;
-  gap:10px;
+  gap:12px;
 }
 .btn {
   background:var(--accent);
   color:#fff;
-  border:none;
-  padding:10px 14px;
+  border:1px solid var(--accent);
+  padding:10px 16px;
   border-radius:8px;
   cursor:pointer;
 }
 .btn.secondary {
   background:#fff;
   color:var(--accent);
-  border:1px solid var(--accent);
 }
-
-/* ===== IMPRESSÃO ===== */
+.no-print {}
 .print-area { display:none; }
 
 @media print {
   .no-print { display:none !important; }
   .print-area { display:block; }
   @page { size:A4; margin:8mm; }
-  body { font-size:11px; color:#000; }
-  .print-table {
-    width:100%;
-    border-collapse:collapse;
-  }
-  .print-table th, .print-table td {
-    border:1px solid #000;
-    padding:6px;
-  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== TELA ===== -->
 <div class="container no-print">
 
   <div class="card brand-header">
-    <img id="logo" src="logo.png" alt="Logo">
+    <img id="logo" src="logo.png" alt="Logo Dra Kevlen">
     <div>
       <h1 class="brand-title">Dra. Kevlen Nogueira</h1>
       <div class="brand-sub">
@@ -157,37 +145,20 @@ textarea { min-height:80px; }
     <button class="btn" onclick="gerarFicha()">Gerar PDF</button>
     <button class="btn secondary" onclick="limpar()">Limpar</button>
   </div>
+
 </div>
 
-<!-- ===== IMPRESSÃO ===== -->
 <div class="container print-area" id="printArea">
+  <h2>Dra. Kevlen Nogueira</h2>
+  <p id="pOut"></p>
+  <p id="dOut"></p>
 
-  <div style="display:grid;grid-template-columns:80px 1fr;gap:12px;">
-    <img id="logoPrint" style="width:80px;height:80px;">
-    <div>
-      <b style="font-size:16px;">Dra. Kevlen Nogueira</b><br>
-      <span style="font-size:12px;">
-        Falo sobre emagrecimento e hormônios de um jeito que você entende e sente
-      </span>
-    </div>
-  </div>
-
-  <p><b>Paciente:</b> <span id="pOut"></span> | <b>Data:</b> <span id="dOut"></span></p>
-
-  <table class="print-table">
-    <thead>
-      <tr>
-        <th>Categoria</th>
-        <th>Código</th>
-        <th>Protocolo</th>
-        <th>✔</th>
-      </tr>
-    </thead>
-    <tbody id="tabelaPrint"></tbody>
+  <table border="1" width="100%" id="tabelaPrint">
+    <tbody></tbody>
   </table>
 
   <p><b>Observações:</b></p>
-  <div id="obsOut" style="border:1px solid #000;min-height:40px;padding:6px;"></div>
+  <div id="obsOut"></div>
 </div>
 
 <script>
@@ -195,80 +166,67 @@ const grupos = [
   {
     nome:"Protocolos Originais (STI)",
     items:[
-      {codigo:"STI 1",nome:"Acelerador Metabólico"},
-      {codigo:"STI 2",nome:"Lipólise e Performance"}
+      {codigo:"STI 1", nome:"Acelerador Metabólico"},
+      {codigo:"STI 2", nome:"Lipólise e Performance"}
     ]
   }
 ];
 
-const protContainer = document.getElementById("protocols");
-const logoPrintEl = document.getElementById("logoPrint");
+const protContainer = document.getElementById('protocols');
 
-function renderProtocolos(){
-  protContainer.innerHTML="";
-  grupos.forEach((g,gi)=>{
-    const t=document.createElement("div");
-    t.className="section-title";
-    t.textContent=g.nome;
-    protContainer.appendChild(t);
-    g.items.forEach((p,i)=>{
-      protContainer.innerHTML+=`
-        <div class="protocol-item">
-          <input type="checkbox" id="chk_${gi}_${i}">
+function renderProtocolos() {
+  grupos.forEach((g,gIdx)=>{
+    const title = document.createElement('div');
+    title.className='section-title';
+    title.textContent=g.nome;
+    protContainer.appendChild(title);
+
+    g.items.forEach((p,idx)=>{
+      const row=document.createElement('div');
+      row.className='protocol-item';
+      row.innerHTML=`
+        <label>
+          <input type="checkbox" id="chk_${gIdx}_${idx}">
           <b>${p.codigo}</b> — ${p.nome}
-        </div>`;
+        </label>`;
+      protContainer.appendChild(row);
     });
   });
 }
 
-function gerarFicha(){
-  const nome=paciente.value;
-  const data=dataEl.value;
-  const obs=obsEl.value;
+function gerarFicha() {
+  document.getElementById('pOut').textContent =
+    "Paciente: " + (paciente.value || "—");
+  document.getElementById('dOut').textContent =
+    "Data: " + (data.value || "—");
+  document.getElementById('obsOut').textContent = obs.value;
 
-  pOut.textContent=nome||"—";
-  dOut.textContent=data||"—";
-  obsOut.textContent=obs||"";
-  logoPrintEl.src=logo.src;
+  const tbody=document.querySelector('#tabelaPrint tbody');
+  tbody.innerHTML='';
 
-  tabelaPrint.innerHTML="";
-  let ok=false;
-
-  grupos.forEach((g,gi)=>{
-    g.items.forEach((p,i)=>{
-      if(document.getElementById(`chk_${gi}_${i}`).checked){
-        ok=true;
-        tabelaPrint.innerHTML+=`
+  grupos.forEach((g,gIdx)=>{
+    g.items.forEach((p,idx)=>{
+      if(document.getElementById(`chk_${gIdx}_${idx}`).checked){
+        tbody.innerHTML+=`
           <tr>
             <td>${g.nome}</td>
             <td>${p.codigo}</td>
             <td>${p.nome}</td>
-            <td style="text-align:center;">✔</td>
           </tr>`;
       }
     });
   });
 
-  if(!ok){ alert("Selecione ao menos um protocolo"); return; }
-  document.getElementById("printArea").style.display="block";
+  document.getElementById('printArea').style.display='block';
   window.print();
 }
 
 function limpar(){
-  paciente.value="";
-  dataEl.value="";
-  obsEl.value="";
-  document.getElementById("printArea").style.display="none";
+  paciente.value='';
+  data.value='';
+  obs.value='';
+  document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
 }
-
-const paciente=document.getElementById("paciente");
-const dataEl=document.getElementById("data");
-const obsEl=document.getElementById("obs");
-const pOut=document.getElementById("pOut");
-const dOut=document.getElementById("dOut");
-const obsOut=document.getElementById("obsOut");
-const tabelaPrint=document.getElementById("tabelaPrint");
-const logo=document.getElementById("logo");
 
 renderProtocolos();
 </script>
