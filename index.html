@@ -227,26 +227,27 @@
     {
       nome: "Protocolos Originais (STI)",
       items: [
+
         { codigo: "STI 1", nome: "Acelerador Metabólico" },
         { codigo: "STI 2", nome: "Lipólise e Performance" },
         { codigo: "STI 3", nome: "Contenção Alimentar" },
         { codigo: "STI 4", nome: "Contenção Carbo" },
         { codigo: "STI 5", nome: "Ansiedade e Estresse" },
         { codigo: "STI 6", nome: "Booster Emagrecedor" },
-      { codigo: "STI 7", nome: "Vitamina D" },
-      { codigo: "STI 8", nome: "Vitamina C" },
-      { codigo: "STI 9", nome: "B12 (cianocobalamina)" },
-      { codigo: "STI 10", nome: "B12 (metilcobalamina)" },
-      { codigo: "STI 11", nome: "ADEK" },
-      { codigo: "STI 12", nome: "Tiamina" },
-      { codigo: "STI 13", nome: "Resveratrol" },
-      { codigo: "STI 14", nome: "Ácido alfa-lipóico" },
-      { codigo: "STI 15", nome: "Complexo B" },
-      { codigo: "STI 18", nome: "Complexo B1" },
-      { codigo: "STI 19", nome: "Protocolo de gordura localizada" },
-
+        { codigo: "STI 7", nome: "Vitamina D" },
+        { codigo: "STI 8", nome: "Vitamina C" },
+        { codigo: "STI 9", nome: "B12 (cianocobalamina)" },
+        { codigo: "STI 10", nome: "B12 (metilcobalamina)" },
+        { codigo: "STI 11", nome: "ADEK" },
+        { codigo: "STI 12", nome: "Tiamina" },
+        { codigo: "STI 13", nome: "Resveratrol" },
+        { codigo: "STI 14", nome: "Ácido alfa-lipóico" },
+        { codigo: "STI 15", nome: "Complexo B" },
         { codigo: "STI 16", nome: "Aporte Vitamínico Capilar" },
-        { codigo: "STI 17", nome: "Vitalidade Capilar" }
+        { codigo: "STI 17", nome: "Vitalidade Capilar" },
+        { codigo: "STI 18", nome: "Complexo B1" },
+        { codigo: "STI 19", nome: "Protocolo de gordura localizada" }
+
       ]
     },
     {
@@ -310,19 +311,29 @@
     const tbody = document.querySelector('#tabelaPrint tbody');
     tbody.innerHTML = '';
 
+    let temSelecionado = false;
+
     grupos.forEach((g, gIdx) => {
       g.items.forEach((p, idx) => {
-        const marcado = document.getElementById(`chk_${gIdx}_${idx}`).checked;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${g.nome}</td>
-          <td style="text-align:center;">${p.codigo}</td>
-          <td>${p.nome}</td>
-          <td style="text-align:center;">${marcado ? "✔" : ""}</td>
-        `;
-        tbody.appendChild(tr);
+        const checkbox = document.getElementById(`chk_${gIdx}_${idx}`);
+        if (checkbox && checkbox.checked) {
+          temSelecionado = true;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${g.nome}</td>
+            <td style="text-align:center;">${p.codigo}</td>
+            <td>${p.nome}</td>
+            <td style="text-align:center;">✔</td>
+          `;
+          tbody.appendChild(tr);
+        }
       });
     });
+
+    if (!temSelecionado) {
+      alert("Selecione pelo menos um protocolo antes de gerar o PDF.");
+      return;
+    }
 
     document.getElementById('printArea').style.display = 'block';
     window.print();
