@@ -294,38 +294,50 @@
     });
   }
 
-  function gerarFicha() {
-    const nome = document.getElementById('paciente').value.trim();
-    const data = document.getElementById('data').value;
-    const obs = document.getElementById('obs').value.trim();
+  <script>
+function gerarFicha() {
+  const nome = document.getElementById('paciente').value.trim();
+  const data = document.getElementById('data').value;
+  const obs = document.getElementById('obs').value.trim();
 
-    document.getElementById('pOut').textContent = nome || '—';
-    document.getElementById('dOut').textContent = data || '—';
-    document.getElementById('obsOut').textContent = obs || '';
+  document.getElementById('pOut').textContent = nome || '—';
+  document.getElementById('dOut').textContent = data || '—';
+  document.getElementById('obsOut').textContent = obs || '';
 
-    // Logo fixo impresso
-    logoPrintEl.src = logoEl.src || '';
+  logoPrintEl.src = logoEl.src || '';
 
-    const tbody = document.querySelector('#tabelaPrint tbody');
-    tbody.innerHTML = '';
+  const tbody = document.querySelector('#tabelaPrint tbody');
+  tbody.innerHTML = '';
 
-    grupos.forEach((g, gIdx) => {
-      g.items.forEach((p, idx) => {
-        const marcado = document.getElementById(`chk_${gIdx}_${idx}`).checked;
+  let temSelecionado = false;
+
+  grupos.forEach((g, gIdx) => {
+    g.items.forEach((p, idx) => {
+      const checkbox = document.getElementById(`chk_${gIdx}_${idx}`);
+      if (checkbox && checkbox.checked) {
+        temSelecionado = true;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${g.nome}</td>
           <td style="text-align:center;">${p.codigo}</td>
           <td>${p.nome}</td>
-          <td style="text-align:center;">${marcado ? "✔" : ""}</td>
+          <td style="text-align:center;">✔</td>
         `;
         tbody.appendChild(tr);
-      });
+      }
     });
+  });
 
-    document.getElementById('printArea').style.display = 'block';
-    window.print();
+  if (!temSelecionado) {
+    alert("Selecione pelo menos um protocolo antes de gerar o PDF.");
+    return;
   }
+
+  document.getElementById('printArea').style.display = 'block';
+  window.print();
+}
+</script>
+
 
   function limpar() {
     document.getElementById('paciente').value = '';
